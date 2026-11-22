@@ -2,5 +2,8 @@
   "schemaVersion": 1,
   "kind": "frameback.project",
   "name": "<topico>_<situacion>",
-  "created": "AAAA-MM-DD"
+  "created": "AAAA-MM-DD",
+  "pieces": [
+    { "id": "reel" }
+  ]
 }

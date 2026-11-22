@@ -9,10 +9,11 @@ Reuses render.py: concat_segments, build_final_composite (subtitles LAST),
 apply_loudnorm_two_pass (-14 LUFS / -1 dBTP).
 
 Usage (run with video-use's venv):
-    python edit/gbo_render.py edit/edl.json --preview -o entregas/ia_charla-agentes_reel_v01.mp4   # 540×960, fast
-    python edit/gbo_render.py edit/edl.json -o entregas/ia_charla-agentes_reel_v02.mp4             # 1080×1920 final
-    Pass -o with a name per references/nombres.md (one counter from preview to final) in entregas/ (what the
-    creator reviews; then edit/deliver.py archives the previous version). Without -o the default is
+    python edit/gbo_render.py edit/edl.json --preview -o entregas/reel/ia_charla-agentes_reel_v01.mp4   # 540×960, fast
+    python edit/gbo_render.py edit/edl.json -o entregas/reel/ia_charla-agentes_reel_v02.mp4             # 1080×1920 final
+    Pass -o with a name per references/nombres.md (one counter from preview to final) in entregas/<piece>/
+    (what the creator reviews, one folder per piece: reel | yt | feed | reel-N-slug; created if missing; then
+    edit/deliver.py archives the previous version). Without -o the default is
     edit/preview_vertical.mp4 / edit/final_vertical.mp4: a check render, not a deliverable. Projects without
     proyecto.json (before the folder template) keep rendering to edit/.
     Next to the output only the deliverable sidecars are written (<out>.timeline.json); intermediates
@@ -379,6 +380,7 @@ def main() -> None:
     work = edit_dir / f"work_{tag}"
     work.mkdir(exist_ok=True)
     out = (args.output or edit_dir / f"{tag}_vertical.mp4").resolve()
+    out.parent.mkdir(parents=True, exist_ok=True)  # entregas/<piece>/ on the first delivery of a piece
 
     seg_paths, seg_durs = [], []
     for i, r in enumerate(edl["ranges"]):
