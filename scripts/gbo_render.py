@@ -9,10 +9,14 @@ Reuses render.py: concat_segments, build_final_composite (subtitles LAST),
 apply_loudnorm_two_pass (-14 LUFS / -1 dBTP).
 
 Usage (run with video-use's venv):
-    python edit/gbo_render.py edit/edl.json --preview -o edit/ia_charla-agentes_reel_v01.mp4   # 540×960, fast
-    python edit/gbo_render.py edit/edl.json -o edit/ia_charla-agentes_reel_v02.mp4             # 1080×1920 final
-    Pass -o with a name per references/nombres.md (one counter from preview to final); without -o the
-    default is edit/preview_vertical.mp4 / edit/final_vertical.mp4, which is not a deliverable name.
+    python edit/gbo_render.py edit/edl.json --preview -o entregas/ia_charla-agentes_reel_v01.mp4   # 540×960, fast
+    python edit/gbo_render.py edit/edl.json -o entregas/ia_charla-agentes_reel_v02.mp4             # 1080×1920 final
+    Pass -o with a name per references/nombres.md (one counter from preview to final) in entregas/ (what the
+    creator reviews; then edit/deliver.py archives the previous version). Without -o the default is
+    edit/preview_vertical.mp4 / edit/final_vertical.mp4: a check render, not a deliverable. Projects without
+    proyecto.json (before the folder template) keep rendering to edit/.
+    Next to the output only the deliverable sidecars are written (<out>.timeline.json); intermediates
+    (<stem>.cards.json, captions, work_*/) stay in edit/.
 
 Optional EDL keys:
     "hflip": true            mirror-correct selfie footage (text on clothes/objects reads backwards)
@@ -23,7 +27,7 @@ Optional EDL keys:
     per range: "speed": 1.2  (setpts/atempo; captions and sidecar follow), "mute": true (silence that range)
     per b-roll: "at": [range_index, source_time]   anchor resolved to output time (survives re-cuts)
     "cards": [{"from": [i, t] | seconds, "to": [i, t] | seconds | "end", ...}]  timed overlays resolved to
-                             output time and written to <out>.cards.json (for Remotion props)
+                             output time and written to edit/<out stem>.cards.json (for Remotion props)
     caption_style.rounded: true   rounded box drawn in ASS behind each chunk (needs PIL + the caption font file,
                              GBO_CAPTION_FONT_FILE); size / y optional
 """
@@ -398,7 +402,7 @@ def main() -> None:
         c["end_in_output"] = (at(c["to"]) if isinstance(c["to"], list)
                               else sum(seg_durs) if c["to"] == "end" else c["to"])
     if edl.get("cards"):
-        out.with_suffix(".cards.json").write_text(json.dumps(edl["cards"], indent=1, ensure_ascii=False))
+        (edit_dir / f"{out.stem}.cards.json").write_text(json.dumps(edl["cards"], indent=1, ensure_ascii=False))
 
     base = work / "base.mp4"
     render.concat_segments(seg_paths, base, work)
@@ -418,7 +422,7 @@ def main() -> None:
         print(f"captions → {subs.name} ({n} cues)")
 
     render.SUB_FORCE_STYLE = "Alignment=2"   # keep our ASS style; render.py's default is Helvetica 18 caps
-    tmp = out.with_suffix(".prenorm.mp4")
+    tmp = work / f"{out.stem}.prenorm.mp4"   # intermediate: workshop, never next to the deliverable
     render.build_final_composite(base, overlays, subs, tmp, edit_dir)
     render.apply_loudnorm_two_pass(tmp, out, preview=False)
     tmp.unlink(missing_ok=True)

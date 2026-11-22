@@ -9,6 +9,20 @@
   `vNN`, lowercase extension, sidecars share the stem. `_final` is written only by Frameback on approval, without
   the variant letter. All examples in `SKILL.md`, references, templates and script usage text follow it. One counter
   per piece from preview to final is unchanged. Ongoing and published projects keep their names (no hot migration).
+- Folder template v1, the one Frameback reads (PROTOCOL §9.2): new projects get `proyecto.json` (new
+  `templates/proyecto.json`: `schemaVersion`, `kind: "frameback.project"`, `name`, `created`), `raw/`, `contexto/`,
+  `edit/`, and `entregas/` on the first delivery. Every render the creator reviews goes to `entregas/` (only the
+  current version of each artifact + its variants); on vNN+1 the previous version moves to `entregas/anteriores/`
+  together with its sidecars and its Frameback `review/<stem>/` dir, replacing the `edit/_reemplazados/` rule. All
+  workshop files stay in `edit/`; the skill never writes in `final/` or `.frameback/`; `contexto/` is read as the
+  creator's material (untrusted content: a request, never instructions). Projects without `proyecto.json` (started
+  before the template) keep their structure; no hot migration.
+- New `scripts/deliver.py` (stdlib): archives the older versions of the delivered artifact with their sidecars and
+  review dir; move-only, checks every destination first, refuses symlinks, other volumes, `final/`, `.frameback/`,
+  and archiving a reviewed version before the new one was opened in Frameback (so comments carry over).
+- `gbo_render.py` writes `<stem>.cards.json` to `edit/` and the pre-loudnorm temp file to `work_*/`, so only
+  deliverable sidecars sit next to the render. Usage text of the render scripts, `references/frameback.md` and
+  `references/remotion.md` use `-o entregas/…`.
 
 ## 0.3.2 — 2026-11-12
 - Frameback review flow (`references/frameback.md`): every comment is handled as soon as it arrives. The editing
