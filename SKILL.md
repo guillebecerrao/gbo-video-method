@@ -79,7 +79,7 @@ Cuando el creador diga "nuevo video", "video nuevo con gbo-video" o describa una
 1. **Ubicación:** crear el proyecto dentro de la carpeta donde está abierto Claude Code o en la
    raíz de proyectos del perfil. Si la carpeta actual ya parece un proyecto (tiene `brief.md`,
    `guion_snapshot.md` o `raw/`), preguntar antes de crear otro dentro.
-2. **Nombre de carpeta:** `AAAA-MM-DD_topico_situacion` con la fecha de grabación (la prevista si aún no se graba), un tópico amplio (`ia`, `marca-personal`, `builderia`) y 2–4 palabras de la situación, en minúsculas y sin tildes ni ñ (ver `references/nombres.md`). Proponerlo y aceptar el que prefiera el creador.
+2. **Nombre de carpeta:** `AAAA-MM-DD_topico_situacion` con la fecha de grabación (la prevista si aún no se graba; si cambia, renombrar al ingerir, solo antes de la primera entrega), un tópico amplio (`ia`, `marca-personal`, `builderia`) y 2–4 palabras de la situación, en minúsculas y sin tildes ni ñ (ver `references/nombres.md`). Proponerlo y aceptar el que prefiera el creador.
 3. **Estructura:** crear `brief.md`, `raw/` y `edit/`. No crear `guion.md` hasta que el brief esté aprobado.
 4. **Brief:** copiar `templates/brief.md` y llenarlo con lo que el creador ya dijo. Preguntar en UNA sola tanda solo lo que falte (plataforma, ángulo STORY/VALUE, duración, CTA). Proponer valores por defecto razonables en vez de dejar campos vacíos.
 5. **Guion:** con el brief aprobado, redactar `guion.md` desde `templates/guion.md` (o pedir el guion del sistema externo). Sugerir leerlo en voz alta e iterar hasta que suene natural. ⏸ Aprobación antes de grabar.
@@ -142,9 +142,9 @@ Lo que el agente no detecta aquí lo descubre el creador en la versión 3. Por c
 
 Evita que el creador revise el archivo equivocado (caso real: abrir `final_youtube.v1.mp4` creyendo que era el más nuevo, cuando la corrección estaba en `final_youtube.mp4`).
 - **Nombres** según `references/nombres.md` (regex comprobable ahí): `<topico>_<situacion>_<formato>[_<artefacto>][_<variante>]_vNN.<ext>`,
-  sin fecha, `formato` ∈ `reel|yt|feed` (otra pieza del mismo formato: `reel-2-<slug>`), `vNN` de dos dígitos.
-  Ej.: `ia_charla-agentes_reel_v01.mp4`, `ia_charla-agentes_yt_v02.mp4`, `ia_ministra-ciencia-evento_reel-2-backstage_v01.mp4`.
-  `_final` lo crea Frameback al aprobar (copia); gbo-video nunca escribe un `_final`. Proyectos en curso conservan
+  sin fecha, `formato` ∈ `reel|yt|feed` (varias piezas del mismo formato: todas `reel-1-<slug>`, `reel-2-<slug>`…; una sola: `reel`), `vNN` de dos dígitos.
+  Ej.: `ia_charla-agentes_reel_v01.mp4`, `ia_charla-agentes_yt_v02.mp4`, `ia_ministra-ciencia-evento_reel-2-backstage_v01.mp4`. Extensión en minúsculas.
+  `_final` lo crea Frameback al aprobar (copia, sin letra de variante); gbo-video nunca escribe un `_final`. Proyectos en curso conservan
   sus nombres (no migrar en caliente); los publicados no se migran.
 - Todo archivo que el creador revisa lleva versión explícita y creciente desde la primera entrega: `…_reel_v01.mp4`, `…_reel_v02.mp4`… Nunca un nombre sin número que se sobrescribe mientras el respaldo recibe el número.
 - Al entregar una versión nueva, mover las anteriores a `edit/_reemplazados/`: en la carpeta de entrega queda **un solo** candidato por pieza.
