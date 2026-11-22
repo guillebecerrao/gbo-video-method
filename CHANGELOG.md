@@ -22,7 +22,8 @@ script sidecar.
   before the template) keep their structure; no hot migration.
 - New `scripts/deliver.py` (stdlib): archives the older versions of the delivered artifact with their sidecars and
   review dir; move-only, checks every destination first, refuses symlinks, other volumes, `final/`, `.frameback/`,
-  and archiving a reviewed version before the new one was opened in Frameback (so comments carry over).
+  and archiving a reviewed version before the new one was opened in Frameback (so comments carry over). Warns when
+  `proyecto.json` still has the template placeholders (`created`/`name`), which Frameback rejects.
 - `gbo_render.py` writes `<stem>.cards.json` to `edit/` and the pre-loudnorm temp file to `work_*/`, so only
   deliverable sidecars sit next to the render. Usage text of the render scripts, `references/frameback.md` and
   `references/remotion.md` use `-o entregas/…`.

@@ -47,12 +47,28 @@ def parse(name: str):
     return {"key": (d["topic"], d["situation"], d["piece"], d["artifact"] or ""), "n": int(d["n"]), "stem": stem}
 
 
+def check_manifest(manifest: Path, data: dict) -> None:
+    """Warn (never fix, never fail) when the manifest still has template placeholders: Frameback rejects it."""
+    import datetime as _dt
+    problems = []
+    try:
+        _dt.date.fromisoformat(str(data.get("created", "")))
+    except ValueError:
+        problems.append(f"created={data.get('created')!r} no es una fecha AAAA-MM-DD real")
+    if not isinstance(data.get("name"), str) or not data["name"].strip() or "<" in data["name"]:
+        problems.append(f"name={data.get('name')!r} sigue con el placeholder de la plantilla")
+    if problems:
+        print(f"deliver: aviso: {manifest.name} no pasa la validación de Frameback ({'; '.join(problems)}); "
+              "rellénalo con la fecha de la carpeta y <topico>_<situacion>", file=sys.stderr)
+
+
 def project_layout(project: Path) -> dict:
     layout = dict(DEFAULT_LAYOUT)
     manifest = next((m for m in (project / "proyecto.json", project / "frameback.project.json") if m.is_file()), None)
     if manifest:
         try:
             data = json.loads(manifest.read_text())
+            check_manifest(manifest, data)
             for k in DEFAULT_LAYOUT:
                 v = (data.get("layout") or {}).get(k)
                 if isinstance(v, str) and v and not v.startswith("/") and ".." not in v.split("/"):

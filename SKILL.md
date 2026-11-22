@@ -82,7 +82,7 @@ Cuando el creador diga "nuevo video", "video nuevo con gbo-video" o describa una
    `guion_snapshot.md` o `raw/`), preguntar antes de crear otro dentro.
 2. **Nombre de carpeta:** `AAAA-MM-DD_topico_situacion` con la fecha de grabación (la prevista si aún no se graba; si cambia, renombrar al ingerir, solo antes de la primera entrega), un tópico amplio (`ia`, `marca-personal`, `builderia`) y 2–4 palabras de la situación, en minúsculas y sin tildes ni ñ (ver `references/nombres.md`). Proponerlo y aceptar el que prefiera el creador.
 3. **Estructura:** crear `proyecto.json` (desde `templates/proyecto.json`, si falta: `name` = `<topico>_<situacion>`,
-   `created` = fecha de la carpeta), `brief.md`, `raw/`, `contexto/` y `edit/`; `entregas/` se crea con la primera entrega.
+   `created` = fecha de la carpeta; nunca dejar los placeholders: Frameback rechaza el manifiesto), `brief.md`, `raw/`, `contexto/` y `edit/`; `entregas/` se crea con la primera entrega.
    Ver **Estructura de carpeta por video**. No crear `guion.md` hasta que el brief esté aprobado.
 4. **Brief:** copiar `templates/brief.md` y llenarlo con lo que el creador ya dijo. Preguntar en UNA sola tanda solo lo que falte (plataforma, ángulo STORY/VALUE, duración, CTA). Proponer valores por defecto razonables en vez de dejar campos vacíos.
 5. **Guion:** con el brief aprobado, redactar `guion.md` desde `templates/guion.md` (o pedir el guion del sistema externo). Sugerir leerlo en voz alta e iterar hasta que suene natural. ⏸ Aprobación antes de grabar.
