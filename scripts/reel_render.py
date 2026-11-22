@@ -178,6 +178,8 @@ def main():
                     help="remotion (default; también tarjetas, zooms y flashes) o ass (captions quemadas con ffmpeg)")
     ap.add_argument("--edit-dir", type=Path, help="carpeta edit/ del proyecto (default: la del EDL)")
     ap.add_argument("--work", type=Path, help="carpeta de intermedios (default: edit/work_preview|work_final)")
+    ap.add_argument("--no-script", action="store_true",
+                    help="no escribir el sidecar <salida>.script.json desde edit/guion.json (Frameback, opcional)")
     a = ap.parse_args()
 
     edl = json.loads(a.edl.read_text())
@@ -537,6 +539,13 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             "tracks": [{"id": i, "label": l, "kind": k, "items": it} for i, l, k, it in tracks if it]}
     out.with_suffix(".timeline.json").write_text(json.dumps(side, ensure_ascii=False, indent=1))
     (work / "timing.json").write_text(json.dumps(segs, ensure_ascii=False, indent=1))
+    if not a.no_script and (edit / "guion.json").is_file():
+        try:
+            import script_sidecar  # junto a este script (scripts/ o la copia en edit/)
+            sp = script_sidecar.write_script_sidecar(out, edit)
+            print(f"guion → {sp.name} (Frameback, opcional)")
+        except Exception as e:  # el sidecar nunca debe romper un render
+            print(f"aviso: no se escribió el guion de Frameback: {e}", file=sys.stderr)
     print(f"caption shifts: {[s.get('_cap_shift') for s in segs if s.get('captions')]}")
     print(f"\nlisto: {out} ({total:.2f}s)")
 

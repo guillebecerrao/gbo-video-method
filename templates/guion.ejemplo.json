@@ -1,0 +1,50 @@
+{
+ "title": "Por qué una revisión toma tres rondas",
+ "summary": "Mostrar que cada ronda extra cuesta un día y cómo evitarla",
+ "sections": [
+  {
+   "id": "s-hook",
+   "title": "Hook",
+   "purpose": "Detener el scroll",
+   "beats": ["HOOK"],
+   "text": "Cada ronda de revisión te cuesta un día."
+  },
+  {
+   "id": "s-problema",
+   "title": "Problema",
+   "purpose": "Nombrar el dolor",
+   "beats": ["PROBLEMA"],
+   "text": "El comentario llega tarde, sin contexto y en otro chat."
+  },
+  {
+   "id": "s-aparte",
+   "title": "Aparte",
+   "purpose": "Anécdota; se cortó por ritmo",
+   "omitted": true,
+   "text": "La vez que revisé la versión equivocada."
+  },
+  {
+   "id": "s-cta",
+   "title": "CTA",
+   "purpose": "Invitar a probar",
+   "ranges": [[24.0, 28.5]],
+   "text": "Pruébalo en tu próximo video."
+  }
+ ],
+ "guidelines": [
+  {"id": "g-paleta", "section": null, "text": "Dos colores de acento como máximo; captions en el tercio inferior"}
+ ],
+ "decisions": [
+  {"id": "d-001", "section": "s-hook", "text": "Abrir en la cara, sin tarjeta de título", "status": "active", "since": 1}
+ ],
+ "animations": [
+  {"id": "a-lt-1", "section": "s-hook", "kind": "lower_third", "label": "Nombre + rol", "text": "Ana · Editora",
+   "beat": "HOOK", "offset": 1.2, "dur": 3.0},
+  {"id": "a-end", "section": "s-cta", "kind": "end_card", "label": "URL", "start": 25.0, "end": 28.5}
+ ],
+ "directions": [
+  {"id": "r-1", "section": "s-problema", "kind": "recording", "text": "Plano medio, ojos en el tercio superior"},
+  {"id": "r-2", "section": "s-problema", "kind": "editing", "text": "Punch-in en «otro chat»"}
+ ],
+ "original": null
+}

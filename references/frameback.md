@@ -55,3 +55,38 @@ requisito:** si no está disponible, los checkpoints ⏸ funcionan exactamente i
   comentarios nuevos y el clic en planos solo mueve el cabezal. Nada de `--force` en estados sin pedido explícito. Si
   se bloqueó por error, el creador puede pulsar **Reopen review** en el panel de comentarios.
 
+
+## Guion en Frameback (`<stem>.script.json`)
+
+Frameback muestra el **guion del productor** junto al video (secciones, propósito, texto, directrices, decisiones,
+animaciones, indicaciones) si existe `<stem>.script.json` junto al render (contrato: `PROTOCOL.md` §8 de Frameback).
+Sin él, Frameback arma un guion automático desde el timeline.
+
+- **Fuente:** `edit/guion.json`, guion estructurado propio de gbo-video (plantilla `templates/guion.ejemplo.json`). Se
+  arma desde el guion aprobado (`guion.md` / `guion_snapshot.md`) al pasar a edición y es la fuente de verdad del
+  guion **en edición**: los cambios de la revisión se escriben aquí, nunca en el sidecar ni en la copia congelada.
+  - `sections[]`: `id` estable (obligatorio, `^[a-z0-9][a-z0-9._-]{0,63}$`, prefijo `s-`), `title`, `purpose`,
+    `text`, y su ubicación: `beats` (los `beat` de los tramos del EDL; en reels, el `label` del segmento) **o**
+    `ranges` explícitos en segundos del video final (`[[inicio, fin]]` o `[{start, end}]`). `omitted: true` = escrita
+    pero cortada; una sección con `beats` que no calzan con ningún corte queda `omitted` sola.
+  - `guidelines` (`g-`), `decisions` (`d-`: `status` proposed | active | superseded | rejected, `origin`, `since`,
+    `supersedes`), `animations` (`a-`: `kind`, `label`, `start`/`end` en tiempo final, o `beat` + `offset` + `dur`),
+    `directions` (`r-`: `kind` recording | editing). `section` opcional (null = global). Ids únicos en todo el guion
+    y **los mismos entre versiones**: Frameback traslada los comentarios por id.
+  - `original` (opcional): el guion previo a grabar, mismo formato, para comparar (sus tiempos se ignoran).
+- **Generación:** `gbo_render.py` y `reel_render.py` llaman a `scripts/script_sidecar.py` al terminar (`--no-script`
+  lo desactiva; a mano: `python edit/script_sidecar.py edit/<pieza>_vNN.mp4`). Resuelve los rangos contra el
+  `.timeline.json` del render (sin timeline, desde el EDL, aproximado), ordena las secciones como aparecen en el
+  video, pone `version` = el `NN` del nombre, `scriptId` = el nombre sin `_vNN`, `source: prewritten`, `producer`
+  y `video.hash`/`duration` (Frameback marca el guion `ok` solo si el hash calza con el video abierto). Sin
+  `edit/guion.json` no hace nada; si falla, avisa y el render sigue (mismo exit code). Validar a mano:
+  `frameback script --check edit/<pieza>_vNN.script.json`.
+- **Llevar las decisiones de la revisión a vN+1** (en `edit/guion.json`, antes de renderizar la versión siguiente;
+  `since` = número de la versión nueva, `origin.review` = stem de la revisión de vN, `origin.comment` = id `c-NNNN`):
+  - *Comentario aceptado que fija un criterio* → decisión nueva `status: active`, `origin {review, comment}`, `since`.
+  - *Propuesta aceptada* (`human.acceptedProposal` en el comentario, evento `comment.proposal_accepted`) → aplicar el
+    cambio de texto (`proposal.after` en lugar de `proposal.before`, en el campo de `proposal.target`) **y** agregar
+    la decisión `active` con `origin` y `since`. Una propuesta no aceptada no se aplica sola.
+  - *Revertir una decisión* → la anterior pasa a `superseded` y la nueva lleva `supersedes: <id anterior>`.
+  - *Declinado* → comentario `declined` con razón; opcional, una decisión `rejected` con `origin` para que no vuelva.
+  - Nunca cambiar ni reutilizar los ids existentes; las decisiones viejas se conservan con su estado.
