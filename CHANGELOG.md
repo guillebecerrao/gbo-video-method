@@ -24,6 +24,15 @@ One folder per piece in `entregas/` (Frameback BL-090, PROTOCOL §9.2) and files
 - `gbo_render.py` / `reel_render.py`: usage text renders to `-o entregas/<piece>/…` and the output folder is created
   when missing (first delivery of a piece). `script_sidecar.py` run by hand finds `<project>/edit/guion.json` from
   `entregas/<piece>/`, its `anteriores/` or the flat `entregas/` (before, only from `entregas/`).
+- `references/frameback.md`: variations, prototypes and alternatives the creator has to see or choose are delivered
+  in the thread of the comment that asked for them with `frameback reply <dir> <id> [--ask] --attach <file> [--label
+  <text>]… "<message>"` instead of local paths in the message; `reply <dir> --general` for a message of the agent's
+  own at review level. Which files work (regular files inside the project: `edit/staging/<id>/` or
+  `entregas/<piece>/`; never hidden files, `review/`, `.timeline.json` / `.script.json` sidecars, `*.part` or symlinks
+  leaving the project), at most 12 per message, what previews inline, how the creator's answer about one file arrives
+  (`thread.message` with `data.about`), and the MCP equivalent. Needs a Frameback later than 0.1.x with PROTOCOL §3.2
+  (detect with `frameback help reply | grep -- --attach`); without it, replies stay text-only as before. The
+  needs-info step uses `reply --ask` on those versions.
 
 ## 0.4.1 — 2026-11-22
 Frameback `check-name` in QA and general comments (Frameback BL-076 and PROTOCOL §3.1).

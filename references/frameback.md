@@ -11,6 +11,10 @@ requisito:** si no está disponible, los checkpoints ⏸ funcionan exactamente i
   PROTOCOL §3.1 (posterior a 0.1.2): ver `frameback --version` / `frameback help | grep check-name`; para actualizar,
   `npm install -g frameback@latest` cuando esa versión esté publicada, o `npm link` en un clon de `main`. Con una
   versión anterior todo lo demás funciona igual; solo no se ven esos comentarios en `list`/`show`/MCP.
+  Los adjuntos en el hilo (`reply --attach`, `--general`, `--ask`; § Devolver archivos en el hilo) requieren una
+  versión posterior a 0.1.x (PROTOCOL §3.2, BL-089): detectarlo con `frameback help reply | grep -q -- --attach` (no
+  con `--version`: un clon de `main` puede seguir diciendo 0.1.1). Sin eso, `reply` solo lleva texto: decir las rutas
+  en el mensaje y por chat, como antes.
 - **Cuándo:** al entregar un preview (⏸ fase 6) o un final (⏸ fase 8), si el creador pide revisar con Frameback o ya lo
   usa en el proyecto (existe `entregas/<pieza>/review/`, o `edit/review/` en proyectos anteriores a la plantilla).
 - **Rutas:** en proyectos con la plantilla (`proyecto.json`, ver SKILL.md § Estructura de carpeta por video) el video
@@ -36,10 +40,13 @@ requisito:** si no está disponible, los checkpoints ⏸ funcionan exactamente i
      → `--status in_progress` con el plan y **lanzar un subagente en segundo plano** que lo deje listo en staging:
      asset en `edit/staging/<id>/` (o componente/props de Remotion con un still de prueba) y la entrada que usaría en
      `edl.next.json`. Al terminar, el orquestador revisa el resultado y marca `--status prepared --plan "…"`. Varios
-     subagentes pueden correr en paralelo si no tocan lo mismo; dos comentarios sobre el mismo tramo, uno solo.
+     subagentes pueden correr en paralelo si no tocan lo mismo; dos comentarios sobre el mismo tramo, uno solo. Si
+     lo producido es algo que el creador tiene que ver o elegir (variaciones de una tarjeta, dos canciones, un
+     prototipo), se le entrega **en el hilo del comentario** con `reply --attach` (§ Devolver archivos en el hilo).
   3. *Decisión del creador o ambiguo* (re-estructurar el corte, cambiar el hook, gusto no claro) →
-     `--status needs_info` + `frameback reply <dir> <id> "pregunta concreta"` (con opciones si ayuda). No adivinar;
-     cuando responda, pasa a 1 o 2.
+     `--status needs_info` + `frameback reply <dir> <id> --ask "pregunta concreta"` (con opciones si ayuda; si las
+     opciones son archivos, adjuntarlos con `--attach`; `--ask` solo en versiones con §3.2, en 0.1.x sin él). No
+     adivinar; cuando responda, pasa a 1 o 2.
   **Comentarios generales** (`anchor.scope: "video"`, PROTOCOL §3.1): notas sobre la pieza entera («el ritmo se
   arrastra», «la música está alta en todo el video»). Se reconocen así, en el evento de `watch --json` (`data` de
   `comment.created` / `comment.updated` / `comment.carried`) o en `list`/`show --json`:
@@ -70,6 +77,38 @@ requisito:** si no está disponible, los checkpoints ⏸ funcionan exactamente i
   juntos a `entregas/<pieza>/anteriores/`. Así la revisión vieja sigue reproduciendo su video desde `anteriores/`, y
   Frameback re-resuelve el enlace `next` por nombre dentro de las carpetas de la pieza. `deliver.py` se niega si la
   nueva aún no tiene revisión o si el archivo no está en la carpeta de su pieza.
+- **Devolver archivos en el hilo** (PROTOCOL §3.2): variaciones, prototipos, una canción alternativa o un corte de
+  prueba van **adjuntos al comentario que los pidió**, nunca como rutas locales en el mensaje o por terminal (el
+  creador puede estar revisando desde el teléfono u otro computador). Frameback los muestra dentro del hilo, los deja
+  bajar, y el creador responde sobre uno («me quedo con B»):
+
+  ```
+  frameback reply <dir> <id> --ask \
+    --attach edit/staging/<id>/lower-third-a.png --label "A · cálido" \
+    --attach edit/staging/<id>/lower-third-b.png --label "B · más contraste" \
+    "Dos opciones para el lower third: ¿cuál?"
+  frameback reply <dir> --general --attach entregas/yt/ia_charla_yt_thumb-16x9_v02.png "Thumbnail nuevo para esta versión"
+  ```
+
+  - `--attach <ruta>` se repite (máx. **12** por mensaje); `--label` va en el mismo orden (texto, ≤ 200). Sin `--ask`
+    el mensaje es informativo; con `--ask` queda como pregunta pendiente del creador.
+  - `--general` (sin `<id>`) abre un mensaje propio a nivel de la revisión cuando no hay comentario que responder (p.
+    ej. variaciones que nadie pidió o un aviso sobre toda la versión). Queda arriba como «From the agent», con
+    `agent.status: applied`; no se traspasa a la versión siguiente.
+  - **Qué archivos sirven:** archivos regulares dentro de la carpeta del proyecto (la de `proyecto.json`; en proyectos
+    sin plantilla, la carpeta del video): lo de staging (`edit/staging/<id>/`, stills de Remotion en `edit/`) o lo ya
+    entregado en `entregas/<pieza>/`. La ruta puede ser relativa al proyecto, al directorio actual o absoluta; se
+    guarda relativa al proyecto (≤ 1024 caracteres, sin `..`). Se rechazan, y no se escribe nada: archivos ocultos o
+    en carpetas ocultas, cualquier cosa dentro de `review/`, los sidecars `.timeline.json` / `.script.json`, `*.part`
+    y symlinks que salgan del proyecto. El mismo archivo dos veces en un mensaje se guarda una vez.
+  - Se ven en línea solo video, audio, `jpg|jpeg|png|webp|gif` y texto ≤ 1 MB; lo demás (PDF, SVG, HTML…) se baja como
+    archivo. Un revisor con link `--share` ve los adjuntos de las revisiones de su alcance.
+  - El archivo se valida otra vez cada vez que se sirve: no moverlo ni borrarlo mientras la conversación siga viva
+    (si es staging, dejarlo en `edit/staging/<id>/` hasta integrar la versión siguiente).
+  - **Respuesta sobre un archivo:** llega como `thread.message` con `data.about: {path, label}` (en `watch --json`) o
+    en `show --json` (último mensaje humano con `about`). Usar ese `path` para promover el elegido a
+    `edl.next.json` y marcar `--status prepared --plan "…"`.
+  - MCP: `frameback_reply` con `attachments: [{path, label?, kind?}]` y `general: true` en lugar de `id`.
 - **Retro (fase 9):** los comentarios de Frameback son la mejor fuente de aprendizajes: `frameback export <dir>`
   genera un resumen en Markdown para proponer reglas en `<perfil>/aprendizajes.md`.
 - **Estados de la revisión:** `delivered` y `closed` se aplican solo a la revisión de la versión **reemplazada**
