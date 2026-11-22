@@ -9,8 +9,10 @@ Reuses render.py: concat_segments, build_final_composite (subtitles LAST),
 apply_loudnorm_two_pass (-14 LUFS / -1 dBTP).
 
 Usage (run with video-use's venv):
-    python edit/gbo_render.py edit/edl.json --preview   # 540×960, fast
-    python edit/gbo_render.py edit/edl.json             # 1080×1920 final
+    python edit/gbo_render.py edit/edl.json --preview -o edit/ia_charla-agentes_reel_v01.mp4   # 540×960, fast
+    python edit/gbo_render.py edit/edl.json -o edit/ia_charla-agentes_reel_v02.mp4             # 1080×1920 final
+    Pass -o with a name per references/nombres.md (one counter from preview to final); without -o the
+    default is edit/preview_vertical.mp4 / edit/final_vertical.mp4, which is not a deliverable name.
 
 Optional EDL keys:
     "hflip": true            mirror-correct selfie footage (text on clothes/objects reads backwards)

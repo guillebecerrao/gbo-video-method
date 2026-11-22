@@ -1,6 +1,7 @@
 # Brief — [título de trabajo]
 
-- **Fecha / slug:** YYYY-MM-DD_slug
+- **Carpeta:** AAAA-MM-DD_topico_situacion (fecha de grabación; ver `references/nombres.md`)
+- **Piezas:** p. ej. `ia_charla-agentes_reel`, `ia_charla-agentes_yt`
 - **Plataforma(s):** Reels / TikTok / Shorts / YouTube long form
 - **Formato:** grabación 9:16 o 16:9 → salidas: ...
 - **Objetivo:** educar / confianza / conversión / ...

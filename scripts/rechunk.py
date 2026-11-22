@@ -4,7 +4,7 @@
 one-word chunk. This takes its `edit/captions.json` (same chunks, output timeline) plus a plain-text file with ONE CAPTION
 CHUNK PER LINE, in spoken order, and writes new chunks with the original word timings (for Remotion props).
 
-    python edit/rechunk.py edit/captions.json edit/frases.txt -o edit/captions_v2.json
+    python edit/rechunk.py edit/captions.json edit/frases.txt -o edit/captions_frases.json
     python edit/rechunk.py edit/captions.json --dump > edit/frases.txt   # start from the current chunks
 
 Lines are matched word by word against the transcript (case, accents and trailing punctuation ignored), so the text
