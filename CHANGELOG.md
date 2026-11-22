@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+- Naming convention (`references/nombres.md`, with a checkable regex): project folder `YYYY-MM-DD_topic_situation`
+  (recording date, broad topic such as `ia`, `marca-personal`, `builderia`); files without date
+  `<topic>_<situation>_<format>[_<artifact>][_<variant>]_<vNN|final>.<ext>`, format `reel|yt|feed`, extra pieces of
+  the same format as `reel-2-<slug>`, two-digit `vNN`, sidecars share the stem. `_final` is written only by Frameback
+  on approval. All examples in `SKILL.md`, references, templates and script usage text follow it. One counter per
+  piece from preview to final is unchanged. Ongoing and published projects keep their names (no hot migration).
+
 ## 0.3.2 — 2026-11-12
 - Frameback review flow (`references/frameback.md`): every comment is handled as soon as it arrives. The editing
   orchestrator classifies and delegates; anything that needs producing (another photo, song, animation, SFX, regrade)
