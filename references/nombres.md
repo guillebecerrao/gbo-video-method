@@ -63,6 +63,29 @@ carpeta  = ^[0-9]{4}-[0-9]{2}-[0-9]{2}_PARTE_PARTE$
 archivo  = ^PARTE_PARTE_(reel|yt|feed)(-[1-9][0-9]*-PARTE)?(_(cover-9x16|cover-4x5|thumb-16x9|post))?(_[a-z])?_(v[0-9]{2,}|final)\.[a-z0-9]+(\.[a-z0-9]+)*$
 ```
 
+## Comprobar antes de entregar (QA, fase 8)
+
+Antes de avisar una entrega, comprobar los nombres de lo que queda en `entregas/`. **Manda el validador de
+Frameback**; la regex de arriba es la referencia solo cuando no está.
+
+- **Con Frameback** (`command -v frameback`) **y** una versión que tenga el comando (`frameback help | grep -q
+  check-name`; el 0.1.x publicado no lo trae y responde `unknown command` con exit 1, que no hay que leer como
+  «nombre inválido»):
+
+  ```
+  find entregas -maxdepth 1 -type f ! -name '.*' -exec frameback check-name {} +
+  ```
+
+  Solo archivos del primer nivel: `frameback check-name entregas/*` también recibiría las carpetas `anteriores/` y
+  `review/` y las marcaría `fail` (`no_extension`). Lee solo el nombre base (los archivos no necesitan existir).
+  Exit `0` = todos válidos; `1` = alguno inválido (cada `fail` trae `code: reason`, p. ej. `bad_version: version 'v3'
+  needs two digits (e.g. v03)`); `2` = error de uso. Con `--json` imprime `[{name, ok, parsed?, code?, reason?}]`.
+  Corregir cada nombre que falle (renombrar el archivo **y sus sidecars** con el mismo stem) y volver a correrlo hasta
+  exit 0. Si el archivo ya se abrió en Frameback, renombrarlo deja huérfana su revisión: preguntar al creador antes.
+- **Sin Frameback** (o sin `check-name`): comprobar con la regex de § Regex comprobable (más la regla de
+  `_<letra>_final`). Nada más cambia en el flujo.
+- **Proyectos sin `proyecto.json`** (anteriores a la plantilla) se saltan este paso: conservan sus nombres.
+
 ## Proyectos existentes
 
 Los proyectos en curso (p. ej. el de la ministra o HelloWorld) **conservan sus nombres hasta terminar**: no migrar en

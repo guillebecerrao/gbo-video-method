@@ -7,6 +7,10 @@ requisito:** si no está disponible, los checkpoints ⏸ funcionan exactamente i
 
 - **Detección** (una vez por sesión): `command -v frameback`. Si no está, no insistir ni instalar nada sin que
   el creador lo pida; seguir el flujo estándar. (Instalación: `npm install -g frameback`; para desarrollarlo, `npm link` en el clon.)
+  Los comentarios generales (abajo) y `check-name` (QA, `references/nombres.md`) requieren una versión con soporte de
+  PROTOCOL §3.1 (posterior a 0.1.2): ver `frameback --version` / `frameback help | grep check-name`; para actualizar,
+  `npm install -g frameback@latest` cuando esa versión esté publicada, o `npm link` en un clon de `main`. Con una
+  versión anterior todo lo demás funciona igual; solo no se ven esos comentarios en `list`/`show`/MCP.
 - **Cuándo:** al entregar un preview (⏸ fase 6) o un final (⏸ fase 8), si el creador pide revisar con Frameback o ya lo
   usa en el proyecto (existe `entregas/review/`, o `edit/review/` en proyectos anteriores a la plantilla).
 - **Rutas:** en proyectos con la plantilla (`proyecto.json`, ver SKILL.md § Estructura de carpeta por video) el video
@@ -33,6 +37,19 @@ requisito:** si no está disponible, los checkpoints ⏸ funcionan exactamente i
   3. *Decisión del creador o ambiguo* (re-estructurar el corte, cambiar el hook, gusto no claro) →
      `--status needs_info` + `frameback reply <dir> <id> "pregunta concreta"` (con opciones si ayuda). No adivinar;
      cuando responda, pasa a 1 o 2.
+  **Comentarios generales** (`anchor.scope: "video"`, PROTOCOL §3.1): notas sobre la pieza entera («el ritmo se
+  arrastra», «la música está alta en todo el video»). Se reconocen así, en el evento de `watch --json` (`data` de
+  `comment.created` / `comment.updated` / `comment.carried`) o en `list`/`show --json`:
+  - `scope: "video"` y sin `time` → **general**: no hay cuadro, rango, región, entidad ni snapshot que mirar; el
+    cambio aplica a todo el corte (p. ej. bajar la música en toda la mezcla, apretar el aire de todos los cortes).
+  - con `time` → **anclado a tiempo** (puede traer además `target`); `scope` `null` o ausente.
+  - sin `time` y con `target` → **anclado al guion** (sección, decisión…; ver § Guion en Frameback); `scope` `null` o ausente.
+  Se atienden con el mismo flujo de estados, `--plan` y `reply` que cualquier otro (pasos 1–3); como no señalan un
+  punto concreto, ante la duda de dónde o cuánto aplica, `needs_info` con opciones antes que adivinar. Un `PATCH` del
+  creador puede volverlo anclado a tiempo (o al revés): llega como `comment.updated` y se re-planifica. En la versión
+  siguiente siempre se traspasa con su anchor (nunca queda `lost`). Requiere Frameback con §3.1: la interfaz del 0.1.2 no
+  permite crearlos y, si otro Frameback los creó, su `watch --json` transmite el evento (sin `time`) pero su
+  `list`/MCP los salta y `show` falla en ese comentario.
   Comentario editado (`revision` > `seenRevision`) → re-planificar (y cancelar el subagente si quedó obsoleto);
   comentario borrado → deshacer lo preparado. Las decisiones de juicio editorial siguen la regla de **Modelo por fase**.
 - **Al pulsar "Procesar" (`review.submitted`) — el botón del creador gatilla el entregable:** solo se integra lo ya
