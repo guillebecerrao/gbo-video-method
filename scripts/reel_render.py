@@ -1,8 +1,10 @@
 """Reel de montaje musical (beat-synced): complemento de gbo_render.py, que está pensado para talking head.
 
-    python edit/reel_render.py edit/edl.json --preview -o edit/reel_v1.mp4
-    python edit/reel_render.py edit/edl.json -o edit/final_reel_v1.mp4
-    python edit/reel_render.py edit/edl.json -o edit/final_reel_v1.mp4 --captions ass   # sin Remotion
+    python edit/reel_render.py edit/edl.json --preview -o entregas/ia_charla-agentes_reel_v01.mp4
+    python edit/reel_render.py edit/edl.json -o entregas/ia_charla-agentes_reel_v02.mp4
+    python edit/reel_render.py edit/edl.json -o entregas/ia_charla-agentes_reel_v02.mp4 --captions ass   # sin Remotion
+    (nombres: references/nombres.md; un solo contador de preview a final; -o en entregas/, lo que el creador
+    revisa; luego edit/deliver.py archiva la anterior. Proyectos sin proyecto.json siguen renderizando a edit/)
 
 Qué hace:
   - segmentos de voz (cortes por energía, cadena de limpieza) y de montaje: duración en beats con snap a la grilla
@@ -176,6 +178,8 @@ def main():
                     help="remotion (default; también tarjetas, zooms y flashes) o ass (captions quemadas con ffmpeg)")
     ap.add_argument("--edit-dir", type=Path, help="carpeta edit/ del proyecto (default: la del EDL)")
     ap.add_argument("--work", type=Path, help="carpeta de intermedios (default: edit/work_preview|work_final)")
+    ap.add_argument("--no-script", action="store_true",
+                    help="no escribir el sidecar <salida>.script.json desde edit/guion.json (Frameback, opcional)")
     a = ap.parse_args()
 
     edl = json.loads(a.edl.read_text())
@@ -535,6 +539,13 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             "tracks": [{"id": i, "label": l, "kind": k, "items": it} for i, l, k, it in tracks if it]}
     out.with_suffix(".timeline.json").write_text(json.dumps(side, ensure_ascii=False, indent=1))
     (work / "timing.json").write_text(json.dumps(segs, ensure_ascii=False, indent=1))
+    if not a.no_script and (edit / "guion.json").is_file():
+        try:
+            import script_sidecar  # junto a este script (scripts/ o la copia en edit/)
+            sp = script_sidecar.write_script_sidecar(out, edit)
+            print(f"guion → {sp.name} (Frameback, opcional)")
+        except Exception as e:  # el sidecar nunca debe romper un render
+            print(f"aviso: no se escribió el guion de Frameback: {e}", file=sys.stderr)
     print(f"caption shifts: {[s.get('_cap_shift') for s in segs if s.get('captions')]}")
     print(f"\nlisto: {out} ({total:.2f}s)")
 

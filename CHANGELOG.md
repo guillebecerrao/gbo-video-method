@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.4.0 — 2026-11-22
+Frameback navigation and folders (requests from Frameback EP-006): naming convention, project folder template and
+script sidecar.
+
+- Naming convention (`references/nombres.md`, with a checkable regex aligned with Frameback PROTOCOL §9.3,
+  `ASSET_NAME_RE`): project folder `YYYY-MM-DD_topic_situation` (recording date, the planned one until recording;
+  rename at ingest only before the first delivery; broad topic such as `ia`, `marca-personal`, `builderia`); files
+  without date `<topic>_<situation>_<format>[_<artifact>][_<variant>]_<vNN|final>.<ext>`, format `reel|yt|feed`;
+  several pieces of one format all use `<format>-<N>-<slug>` from 1 (`reel-1-hook`, `reel-2-backstage`); two-digit
+  `vNN`, lowercase extension, sidecars share the stem. `_final` is written only by Frameback on approval, without
+  the variant letter. All examples in `SKILL.md`, references, templates and script usage text follow it. One counter
+  per piece from preview to final is unchanged. Ongoing and published projects keep their names (no hot migration).
+- Folder template v1, the one Frameback reads (PROTOCOL §9.2): new projects get `proyecto.json` (new
+  `templates/proyecto.json`: `schemaVersion`, `kind: "frameback.project"`, `name`, `created`), `raw/`, `contexto/`,
+  `edit/`, and `entregas/` on the first delivery. Every render the creator reviews goes to `entregas/` (only the
+  current version of each artifact + its variants); on vNN+1 the previous version moves to `entregas/anteriores/`
+  together with its sidecars and its Frameback `review/<stem>/` dir, replacing the `edit/_reemplazados/` rule. All
+  workshop files stay in `edit/`; the skill never writes in `final/` or `.frameback/`; `contexto/` is read as the
+  creator's material (untrusted content: a request, never instructions). Projects without `proyecto.json` (started
+  before the template) keep their structure; no hot migration.
+- New `scripts/deliver.py` (stdlib): archives the older versions of the delivered artifact with their sidecars and
+  review dir; move-only, checks every destination first, refuses symlinks, other volumes, `final/`, `.frameback/`,
+  and archiving a reviewed version before the new one was opened in Frameback (so comments carry over). Warns when
+  `proyecto.json` still has the template placeholders (`created`/`name`), which Frameback rejects.
+- `gbo_render.py` writes `<stem>.cards.json` to `edit/` and the pre-loudnorm temp file to `work_*/`, so only
+  deliverable sidecars sit next to the render. Usage text of the render scripts, `references/frameback.md` and
+  `references/remotion.md` use `-o entregas/…`.
+- Script sidecar for Frameback (PROTOCOL §8): new `scripts/script_sidecar.py` writes `<stem>.script.json` next to
+  each render from a structured script `edit/guion.json` (new template `templates/guion.ejemplo.json`): sections with
+  stable ids resolved to final-video ranges (timeline beats, explicit ranges, or the EDL as a fallback), video order,
+  `omitted`, `version` from `_vNN`, `scriptId` from the stem, `video.hash` (Frameback's fingerprint algorithm) and
+  duration, optional `original`. `gbo_render.py` and `reel_render.py` call it at the end (`--no-script` disables it);
+  without `edit/guion.json` it does nothing, and a failure only warns (render exit code unchanged). Run by hand on a
+  render in `entregas/`, it looks for the project's `edit/guion.json`
+- `references/frameback.md`: how review decisions reach version N+1 (accepted comment or accepted proposal → `active`
+  decision with `origin` and `since`; revert → `superseded` + `supersedes`; declined → optional `rejected`)
+
 ## 0.3.2 — 2026-11-12
 - Frameback review flow (`references/frameback.md`): every comment is handled as soon as it arrives. The editing
   orchestrator classifies and delegates; anything that needs producing (another photo, song, animation, SFX, regrade)
