@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.4.1 — 2026-11-22
+Frameback `check-name` in QA and general comments (Frameback BL-076 and PROTOCOL §3.1).
+
+- QA (`SKILL.md` checklist, phase 8) and `references/nombres.md`: before announcing a delivery, check the names in
+  `entregas/` with `find entregas -maxdepth 1 -type f ! -name '.*' -exec frameback check-name {} +` (only top-level
+  files: a plain `entregas/*` also passes `anteriores/` and `review/`, which fail as `no_extension`); exit 0 all
+  valid, 1 some invalid (fix them, renaming sidecars with the same stem), 2 usage error; `--json` prints
+  `[{name, ok, parsed?, code?, reason?}]`. Frameback's validator rules; without Frameback, or with a version that has
+  no `check-name` (detect with `frameback help | grep check-name`: older binaries answer `unknown command` with exit
+  1), the regex in `nombres.md` is the reference. Projects without `proyecto.json` skip this step.
+- `references/frameback.md`: general comments (`anchor.scope: "video"`, no `time`; `watch --json` carries
+  `data.scope`) are handled as notes about the whole piece (no frame, range or snapshot) with the same
+  status/plan/reply flow; how to tell them from time-anchored (`time`) and script-anchored (`target` without `time`)
+  comments. Both features need a Frameback with PROTOCOL §3.1 support (later than 0.1.2), with how to update.
+  Without Frameback nothing changes in the flow.
+
 ## 0.4.0 — 2026-11-22
 Frameback navigation and folders (requests from Frameback EP-006): naming convention, project folder template and
 script sidecar.

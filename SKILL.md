@@ -214,6 +214,10 @@ Evita que el creador revise el archivo equivocado (caso real: abrir `final_youtu
 - [ ] El final de la música no cae bajo el CTA
 - [ ] Color convertido según los metadatos (nada lavado ni "nostálgico") y sin material espejado
 - [ ] Duración dentro del rango del brief
+- [ ] Nombres de `entregas/` válidos (`references/nombres.md` § Comprobar antes de entregar): con un Frameback que
+      tenga `check-name`, `find entregas -maxdepth 1 -type f ! -name '.*' -exec frameback check-name {} +` (exit 0 =
+      todos válidos; 1 = corregir los `fail` y volver a correr); sin él, la regex de `nombres.md`. Proyectos sin
+      `proyecto.json` (anteriores a la plantilla) se saltan este paso.
 - [ ] Revisión visual final por el creador
 
 ## Cómo evolucionan las reglas
