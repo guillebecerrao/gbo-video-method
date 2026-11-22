@@ -355,6 +355,8 @@ def main() -> None:
     ap.add_argument("--no-captions", action="store_true")
     ap.add_argument("--no-timeline", action="store_true",
                     help="no escribir el sidecar <salida>.timeline.json (Frameback, opcional)")
+    ap.add_argument("--no-script", action="store_true",
+                    help="no escribir el sidecar <salida>.script.json desde edit/guion.json (Frameback, opcional)")
     args = ap.parse_args()
 
     edl_path = args.edl.resolve()
@@ -427,6 +429,13 @@ def main() -> None:
             print(f"timeline → {tl.name} (Frameback, opcional)")
         except Exception as e:  # el sidecar nunca debe romper un render
             print(f"aviso: no se escribió el timeline de Frameback: {e}", file=sys.stderr)
+    if not args.no_script and (edit_dir / "guion.json").is_file():
+        try:
+            import script_sidecar  # junto a este script (scripts/ o la copia en edit/)
+            sp = script_sidecar.write_script_sidecar(out, edit_dir, edl=edl_path)
+            print(f"guion → {sp.name} (Frameback, opcional)")
+        except Exception as e:  # el sidecar nunca debe romper un render
+            print(f"aviso: no se escribió el guion de Frameback: {e}", file=sys.stderr)
     print(f"\ndone: {out}  ({sum(seg_durs):.2f}s, {out.stat().st_size / 1e6:.1f} MB)")
 
 

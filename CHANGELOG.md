@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+- Script sidecar for Frameback (PROTOCOL §8): new `scripts/script_sidecar.py` writes `<stem>.script.json` next to
+  each render from a structured script `edit/guion.json` (new template `templates/guion.ejemplo.json`): sections with
+  stable ids resolved to final-video ranges (timeline beats, explicit ranges, or the EDL as a fallback), video order,
+  `omitted`, `version` from `_vNN`, `scriptId` from the stem, `video.hash` (Frameback's fingerprint algorithm) and
+  duration, optional `original`. `gbo_render.py` and `reel_render.py` call it at the end (`--no-script` disables it);
+  without `edit/guion.json` it does nothing, and a failure only warns (render exit code unchanged)
+- `references/frameback.md`: how review decisions reach version N+1 (accepted comment or accepted proposal → `active`
+  decision with `origin` and `since`; revert → `superseded` + `supersedes`; declined → optional `rejected`)
+
 ## 0.3.2 — 2026-11-12
 - Frameback review flow (`references/frameback.md`): every comment is handled as soon as it arrives. The editing
   orchestrator classifies and delegates; anything that needs producing (another photo, song, animation, SFX, regrade)

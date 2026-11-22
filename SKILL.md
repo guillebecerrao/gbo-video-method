@@ -46,7 +46,7 @@ antes de instalar**. Nunca instalar en silencio.
 - `references/plan-produccion.md` — modo plan de producción (apoyo a la guionización)
 - `references/frameback.md` — revisión opcional con Frameback
 
-Plantillas: `templates/brief.md`, `templates/guion.md`, `templates/publicacion.md`, `templates/edl.reel.ejemplo.json`, `templates/sfx.ejemplo.json`,
+Plantillas: `templates/brief.md`, `templates/guion.md`, `templates/guion.ejemplo.json`, `templates/publicacion.md`, `templates/edl.reel.ejemplo.json`, `templates/sfx.ejemplo.json`,
 `templates/perfil.md`, `templates/aprendizajes.md`.
 
 ## Principios
@@ -98,7 +98,7 @@ Si llega material ya grabado sin brief: crear la carpeta igual, pedir que deje l
 | 5. Estrategia de corte | Comparar guion vs. transcript (o guion reverso); elegir tomas; proponer corte con timestamps | `edit/estrategia.md` | ⏸ El creador aprueba |
 | 6. Corte y pulido | video-use + ffmpeg según `references/estilo.md` | preview | ⏸ El creador revisa preview |
 | 7. Motion (opcional) | Sincronizar marca (`references/marca.md`), luego Remotion: captions, títulos, lower thirds, paneles | composición | ⏸ |
-| 8. Render y QA | Checklist QA (abajo) + `references/plataformas.md` | `edit/final_<plataforma>_v1.mp4` (ver Versionado) | ⏸ |
+| 8. Render y QA | Checklist QA (abajo) + `references/plataformas.md`; si existe `edit/guion.json`, el render deja `<salida>.script.json` para Frameback | `edit/final_<plataforma>_v1.mp4` (ver Versionado) | ⏸ |
 | 8.5 Publicación | Textos por plataforma desde `templates/publicacion.md`, basados en el corte final; thumbnail/portada según `references/remotion.md` | `publicacion.md` + `edit/thumbnail/` | ⏸ El creador aprueba textos y thumbnail |
 | 9. Retro | Qué funcionó, qué corrigió el creador | entrada en `<perfil>/aprendizajes.md` | El creador aprueba cambios de reglas |
 
@@ -154,7 +154,7 @@ Evita que el creador revise el archivo equivocado (caso real: abrir `final_youtu
 - **video-use + ffmpeg**: corte, limpieza de muletillas, silencios, color, loudness, subtítulos quemados. Transcripción local con `helpers/transcribe_local.py` (sin servicios pagados).
 - **ffmpeg con libass/drawtext**: requerido. En macOS, Homebrew `ffmpeg-full` (keg-only); los scripts lo agregan al PATH solos (`GBO_FFMPEG_DIR` para otra ruta).
 - **Whisper large-v3-turbo** (mlx-whisper): transcripción local con idioma forzado. Parakeet v3 se probó y derivaba a inglés en español con términos técnicos. Igual falla en términos técnicos → glosario.
-- **Scripts** (`scripts/`, copiar a `edit/` de cada proyecto): `gbo_render.py` (corte con punch-in, velocidad y silencio por tramo, conversión de color + grade + espejo, limpieza de voz, B-roll y tarjetas anclados al tiempo de la fuente, captions con caja redondeada, desde un `edl.json`; deja un `.timeline.json` para Frameback), `make_audio.py` (música y SFX sintetizados), `mix_audio.py` (ducking + loudnorm, con música sintetizada o una pista con licencia desde un offset y fade propio), `cut_energy.py` (aire de cada corte medido por energía e islas de voz; correrlo antes de cada preview), `rechunk.py` (re-segmentar los captions por frases antes de Remotion), `reel_render.py` (reel de montaje guiado por la música: segmentos a beats, drop/stop/outro, captions por energía, render con `GboMontage` o captions quemados) y `sfx_track.py` (pista de SFX anclada a los tiempos de los props de Remotion).
+- **Scripts** (`scripts/`, copiar a `edit/` de cada proyecto): `gbo_render.py` (corte con punch-in, velocidad y silencio por tramo, conversión de color + grade + espejo, limpieza de voz, B-roll y tarjetas anclados al tiempo de la fuente, captions con caja redondeada, desde un `edl.json`; deja un `.timeline.json` para Frameback), `make_audio.py` (música y SFX sintetizados), `mix_audio.py` (ducking + loudnorm, con música sintetizada o una pista con licencia desde un offset y fade propio), `cut_energy.py` (aire de cada corte medido por energía e islas de voz; correrlo antes de cada preview), `rechunk.py` (re-segmentar los captions por frases antes de Remotion), `reel_render.py` (reel de montaje guiado por la música: segmentos a beats, drop/stop/outro, captions por energía, render con `GboMontage` o captions quemados), `sfx_track.py` (pista de SFX anclada a los tiempos de los props de Remotion) y `script_sidecar.py` (guion para Frameback: `<salida>.script.json` desde `edit/guion.json`; lo llaman los dos renders, `--no-script` lo desactiva).
 - **Remotion**: motion graphics, captions animados, tarjetas de título, thumbnail. Se compone sobre el corte ya hecho, no lo reemplaza.
 - **Frameback** (opcional): revisión anclada a cuadros, regiones y entidades del timeline, con feedback incremental: cada comentario se atiende al llegar (subagentes adelantan lo que haya que producir) y «Procesar» solo integra y renderiza. Ver `references/frameback.md`. Si no está instalado, los checkpoints funcionan igual por chat.
 - **Teleprompter** (opcional): [teleprompter.guillebecerrao.cl](https://teleprompter.guillebecerrao.cl/), web, sin instalación; editor en el computador y proyección en un iPad, sincronizados por sesión con código y clave. Al aprobar el guion (fase 1), ofrecer una versión limpia para pegar: solo el texto hablado, sin marcadores de edición ni tabla de tomas.
