@@ -1,7 +1,7 @@
 """Sidecar de guion `<stem>.script.json` para Frameback (PROTOCOL §8), desde `edit/guion.json`.
 
-    python edit/script_sidecar.py entregas/ia_charla-agentes_reel_v04.mp4          # busca edit/guion.json del proyecto
-    python edit/script_sidecar.py entregas/ia_charla-agentes_reel_v04.mp4 --guion edit/guion.json --timeline entregas/ia_charla-agentes_reel_v04.timeline.json
+    python edit/script_sidecar.py entregas/reel/ia_charla-agentes_reel_v04.mp4     # busca <proyecto>/edit/guion.json
+    python edit/script_sidecar.py entregas/reel/ia_charla-agentes_reel_v04.mp4 --guion edit/guion.json --timeline entregas/reel/ia_charla-agentes_reel_v04.timeline.json
 
 `gbo_render.py` y `reel_render.py` lo llaman solos al terminar (`--no-script` lo desactiva). Sin `guion.json` no hace
 nada. Es opcional y aditivo: el render nunca depende de él, y el sidecar no hace daño sin Frameback.
@@ -330,16 +330,28 @@ def write_script_sidecar(video: Path, edit_dir: Path, timeline: Path | None = No
     return out
 
 
+def project_edit_dir(vdir: Path) -> Path:
+    """`<proyecto>/edit/` for a video under `entregas/`: `entregas/<pieza>/`, `entregas/<pieza>/anteriores/` or the flat
+    `entregas/` of 0.4.x (also a nested layout: the nearest folder with proyecto.json and edit/). Else the video's folder."""
+    up = [vdir, *list(vdir.parents)[:3]]
+    for d in up:
+        if d.name == "entregas" and (d.parent / "edit").is_dir():
+            return d.parent / "edit"
+    for d in up[1:]:
+        if any((d / m).is_file() for m in ("proyecto.json", "frameback.project.json")) and (d / "edit").is_dir():
+            return d / "edit"
+    return vdir
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Escribe <stem>.script.json (Frameback §8) desde edit/guion.json.")
-    ap.add_argument("video", type=Path, help="render entregado (entregas/<topico>_<situacion>_<formato>_vNN.mp4)")
-    ap.add_argument("--guion", type=Path, help="guion estructurado (default: <proyecto>/edit/guion.json si el video está en entregas/, si no <carpeta del video>/guion.json)")
+    ap.add_argument("video", type=Path, help="render entregado (entregas/<pieza>/<topico>_<situacion>_<pieza>_vNN.mp4)")
+    ap.add_argument("--guion", type=Path, help="guion estructurado (default: <proyecto>/edit/guion.json si el video está bajo entregas/ (entregas/<pieza>/, su anteriores/ o el layout plano), si no <carpeta del video>/guion.json)")
     ap.add_argument("--timeline", type=Path, help="default: <video>.timeline.json")
     ap.add_argument("--edl", type=Path, help="edl.json para ubicar beats si no hay timeline")
     ap.add_argument("--version", type=int, help="forzar version (default: el _vNN del nombre)")
     a = ap.parse_args()
-    vdir = a.video.resolve().parent
-    edit_dir = vdir.parent / "edit" if vdir.name == "entregas" and (vdir.parent / "edit").is_dir() else vdir
+    edit_dir = project_edit_dir(a.video.resolve().parent)
     out = write_script_sidecar(a.video, edit_dir, a.timeline, a.edl, a.guion, a.version)
     if out is None:
         print("sin guion.json: no se escribió sidecar de guion")

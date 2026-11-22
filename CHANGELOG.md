@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.5.0 — 2026-11-22
+One folder per piece in `entregas/` (Frameback BL-090, PROTOCOL §9.2) and files delivered in the review thread
+(Frameback BL-089, PROTOCOL §3.2).
+
+- Folder per piece, always (also with a single piece): every delivered file lives in `entregas/<piece>/`, where
+  `<piece>` is the piece part of its name (`reel`, `yt`, `feed`, `<format>-<N>-<slug>`), with its assets, variants,
+  sidecars and `review/<stem>/` dirs; previous versions in `entregas/<piece>/anteriores/` (each with its sidecars and
+  its review dir); Frameback copies approved files to `final/<piece>/` (the skill still never writes in `final/`).
+  Folders of `entregas/` that are not pieces (e.g. `entregas/muestras/`) are never touched. `SKILL.md` (structure,
+  versioning, scaffold, phase outputs, QA), `references/nombres.md` (new "Carpeta de pieza" section; the `check-name`
+  command now walks the piece folders only), `references/frameback.md` and `references/remotion.md` use the new paths.
+- `templates/proyecto.json` and the scaffold declare `pieces: [{id}]` in the project's order (from the brief, e.g.
+  `yt`, `reel-1-hook`, `reel-2-consejo`; `[{"id": "reel"}]` by default).
+- `scripts/deliver.py`: archives into `entregas/<piece>/anteriores/` (review dir `entregas/<piece>/review/<stem>/`
+  → `anteriores/review/<stem>/`); refuses a file that is not in the folder of its own piece (another piece's folder,
+  a non-piece folder); reads `layout.previous` as relative to each piece folder (a pre BL-090 `entregas/anteriores`
+  still works); warns, never writes, when `pieces` is missing, does not declare the delivered piece, or has invalid or
+  duplicate ids (the manifest is shared with Frameback, which writes `finals` under its own lock). Projects already in
+  the flat 0.4.x layout keep working as before (archive in `entregas/anteriores/`, with a notice): nothing is
+  migrated; moving them into piece folders is the creator's call, by hand (`frameback adopt` does not migrate an
+  adopted project, it only warns `flat_layout`). Projects without `proyecto.json` are unchanged.
+- `gbo_render.py` / `reel_render.py`: usage text renders to `-o entregas/<piece>/…` and the output folder is created
+  when missing (first delivery of a piece). `script_sidecar.py` run by hand finds `<project>/edit/guion.json` from
+  `entregas/<piece>/`, its `anteriores/` or the flat `entregas/` (before, only from `entregas/`).
+
 ## 0.4.1 — 2026-11-22
 Frameback `check-name` in QA and general comments (Frameback BL-076 and PROTOCOL §3.1).
 

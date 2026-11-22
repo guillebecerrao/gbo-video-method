@@ -48,7 +48,7 @@ remotion.dev antes de usarlo comercialmente.
    - paneles divididos con tarjetas/chips sincronizados por palabra
    - tarjeta de título y lower third, con los tokens de `src/theme.ts`
    (el punch-in se hace en ffmpeg, antes de Remotion)
-4. Render: `npx remotion render GboReel entregas/ia_charla-agentes_reel_v04.mp4 --props=edit/props.json` (entregable a `entregas/`; ver SKILL.md § Estructura de carpeta por video)
+4. Render: `npx remotion render GboReel entregas/reel/ia_charla-agentes_reel_v04.mp4 --props=edit/props.json` (entregable a `entregas/<pieza>/`; ver SKILL.md § Estructura de carpeta por video)
 
 ## Regla de carriles
 - Captions simples quemados → ffmpeg / `scripts/gbo_render.py` (más rápido).
@@ -59,7 +59,7 @@ remotion.dev antes de usarlo comercialmente.
   cuatro `layout`: `duo` (dos retratos en caja), `single` (un retrato a todo el ancho), `frame`
   (un frame del propio video a sangre completa, a menudo mejor que una portada diseñada) y `split`
   (dos frames 50/50 con corte vertical). Los ids `GboCoverSolo` y `GboCoverSplit` son alias de `frame` y `split`.
-  Render: `npx remotion still GboThumb entregas/ia_charla-agentes_yt_thumb-16x9_v01.png --props=<json> --public-dir=edit`
+  Render: `npx remotion still GboThumb entregas/yt/ia_charla-agentes_yt_thumb-16x9_v01.png --props=<json> --public-dir=edit`
   (las rutas de imagen en los props son relativas a `edit/`).
 - Diseño de la plantilla: fondo oscuro, texto ≤ 5 palabras a la izquierda con acento, retratos a
   la derecha, monograma. La esquina inferior derecha queda libre (la tapa la duración de YouTube).

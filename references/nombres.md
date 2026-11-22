@@ -14,6 +14,15 @@ nombres. Si alguna vez difieren, **manda §9.3**.
 - **Situación**: 2–4 palabras de qué pasó o de qué trata: `charla-agentes`, `ministra-ciencia-evento`.
 - Ej.: `2026-11-20_ia_charla-agentes/`
 
+## Carpeta de pieza
+
+Cada archivo entregado vive en la carpeta de **su pieza**: `entregas/<pieza>/`, donde `<pieza>` es la parte de pieza
+del nombre (`reel`, `yt`, `feed` o `<formato>-<N>-<slug>`). **Siempre**, también cuando el proyecto tiene una sola pieza
+(`entregas/reel/`). Sus versiones previas, en `entregas/<pieza>/anteriores/`; lo aprobado lo copia Frameback a
+`final/<pieza>/` (PROTOCOL §9.2). Un archivo de otra pieza dentro de una carpeta de pieza Frameback lo lista como sin
+clasificar; los sueltos en `entregas/` solo se leen como legado del layout plano de 0.4.x. Las piezas se declaran en `proyecto.json` (`pieces: [{"id": …}]`, en el orden
+del proyecto). Ej.: `entregas/yt/ia_charla_yt_v03.mp4`, `entregas/reel-1-hook/ia_charla_reel-1-hook_cover-9x16_b_v01.jpg`.
+
 ## Archivos
 
 ```
@@ -65,19 +74,24 @@ archivo  = ^PARTE_PARTE_(reel|yt|feed)(-[1-9][0-9]*-PARTE)?(_(cover-9x16|cover-4
 
 ## Comprobar antes de entregar (QA, fase 8)
 
-Antes de avisar una entrega, comprobar los nombres de lo que queda en `entregas/`. **Manda el validador de
-Frameback**; la regex de arriba es la referencia solo cuando no está.
+Antes de avisar una entrega, comprobar los nombres de lo que queda en las carpetas de pieza `entregas/<pieza>/`, y que
+cada archivo esté en la carpeta de su pieza (la parte de pieza de su nombre = el nombre de la carpeta). **Manda el
+validador de Frameback**; la regex de arriba es la referencia solo cuando no está.
 
 - **Con Frameback** (`command -v frameback`) **y** una versión que tenga el comando (`frameback help | grep -q
   check-name`; el 0.1.x publicado no lo trae y responde `unknown command` con exit 1, que no hay que leer como
   «nombre inválido»):
 
   ```
-  find entregas -maxdepth 1 -type f ! -name '.*' -exec frameback check-name {} +
+  find entregas -mindepth 2 -maxdepth 2 -type f ! -name '.*' \( -path 'entregas/reel*' -o -path 'entregas/yt*' -o -path 'entregas/feed*' \) -exec frameback check-name {} +
   ```
 
-  Solo archivos del primer nivel: `frameback check-name entregas/*` también recibiría las carpetas `anteriores/` y
-  `review/` y las marcaría `fail` (`no_extension`). Lee solo el nombre base (los archivos no necesitan existir).
+  Solo los archivos sueltos de cada carpeta de pieza: un glob como `entregas/*/*` también recibiría las carpetas
+  `anteriores/` y `review/` (las marcaría `fail`, `no_extension`) y los archivos de carpetas que no son pieza
+  (`entregas/muestras/`), que no siguen la convención ni hay que tocar. Lee solo el nombre base (los archivos no
+  necesitan existir), así que no ve la carpeta: que cada archivo esté en `entregas/<su pieza>/` se mira aparte
+  (`deliver.py` se niega a entregar uno fuera de su carpeta). En un proyecto que sigue en el layout plano de 0.4.x
+  (archivos sueltos en `entregas/`), el mismo comando con `find entregas -maxdepth 1 -type f ! -name '.*' …`.
   Exit `0` = todos válidos; `1` = alguno inválido (cada `fail` trae `code: reason`, p. ej. `bad_version: version 'v3'
   needs two digits (e.g. v03)`); `2` = error de uso. Con `--json` imprime `[{name, ok, parsed?, code?, reason?}]`.
   Corregir cada nombre que falle (renombrar el archivo **y sus sidecars** con el mismo stem) y volver a correrlo hasta
