@@ -1,7 +1,7 @@
 """Sidecar de guion `<stem>.script.json` para Frameback (PROTOCOL §8), desde `edit/guion.json`.
 
-    python edit/script_sidecar.py edit/final_reels_v4.mp4                 # busca edit/guion.json
-    python edit/script_sidecar.py edit/final_reels_v4.mp4 --guion edit/guion.json --timeline edit/final_reels_v4.timeline.json
+    python edit/script_sidecar.py entregas/ia_charla-agentes_reel_v04.mp4          # busca edit/guion.json del proyecto
+    python edit/script_sidecar.py entregas/ia_charla-agentes_reel_v04.mp4 --guion edit/guion.json --timeline entregas/ia_charla-agentes_reel_v04.timeline.json
 
 `gbo_render.py` y `reel_render.py` lo llaman solos al terminar (`--no-script` lo desactiva). Sin `guion.json` no hace
 nada. Es opcional y aditivo: el render nunca depende de él, y el sidecar no hace daño sin Frameback.
@@ -65,7 +65,7 @@ def sanitize_id(s: str) -> str:
 
 
 def stem_identity(stem: str) -> tuple[str, int | None]:
-    """`final_reels_v4` → ('final_reels', 4); without `_vNN` → (stem, None)."""
+    """`ia_charla-agentes_reel_v04` → ('ia_charla-agentes_reel', 4); without `_vNN` → (stem, None)."""
     m = VERSION_RE.match(stem)
     if m and m.group("base"):
         return sanitize_id(m.group("base")), int(m.group("n"))
@@ -332,13 +332,15 @@ def write_script_sidecar(video: Path, edit_dir: Path, timeline: Path | None = No
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="Escribe <stem>.script.json (Frameback §8) desde edit/guion.json.")
-    ap.add_argument("video", type=Path, help="render entregado (edit/<pieza>_vNN.mp4)")
-    ap.add_argument("--guion", type=Path, help="guion estructurado (default: <carpeta del video>/guion.json)")
+    ap.add_argument("video", type=Path, help="render entregado (entregas/<topico>_<situacion>_<formato>_vNN.mp4)")
+    ap.add_argument("--guion", type=Path, help="guion estructurado (default: <proyecto>/edit/guion.json si el video está en entregas/, si no <carpeta del video>/guion.json)")
     ap.add_argument("--timeline", type=Path, help="default: <video>.timeline.json")
     ap.add_argument("--edl", type=Path, help="edl.json para ubicar beats si no hay timeline")
     ap.add_argument("--version", type=int, help="forzar version (default: el _vNN del nombre)")
     a = ap.parse_args()
-    out = write_script_sidecar(a.video, a.video.resolve().parent, a.timeline, a.edl, a.guion, a.version)
+    vdir = a.video.resolve().parent
+    edit_dir = vdir.parent / "edit" if vdir.name == "entregas" and (vdir.parent / "edit").is_dir() else vdir
+    out = write_script_sidecar(a.video, edit_dir, a.timeline, a.edl, a.guion, a.version)
     if out is None:
         print("sin guion.json: no se escribió sidecar de guion")
     else:

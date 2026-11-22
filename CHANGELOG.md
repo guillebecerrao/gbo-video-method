@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 — 2026-11-22
+Frameback navigation and folders (requests from Frameback EP-006): naming convention, project folder template and
+script sidecar.
+
 - Naming convention (`references/nombres.md`, with a checkable regex aligned with Frameback PROTOCOL §9.3,
   `ASSET_NAME_RE`): project folder `YYYY-MM-DD_topic_situation` (recording date, the planned one until recording;
   rename at ingest only before the first delivery; broad topic such as `ia`, `marca-personal`, `builderia`); files
@@ -28,7 +31,8 @@
   stable ids resolved to final-video ranges (timeline beats, explicit ranges, or the EDL as a fallback), video order,
   `omitted`, `version` from `_vNN`, `scriptId` from the stem, `video.hash` (Frameback's fingerprint algorithm) and
   duration, optional `original`. `gbo_render.py` and `reel_render.py` call it at the end (`--no-script` disables it);
-  without `edit/guion.json` it does nothing, and a failure only warns (render exit code unchanged)
+  without `edit/guion.json` it does nothing, and a failure only warns (render exit code unchanged). Run by hand on a
+  render in `entregas/`, it looks for the project's `edit/guion.json`
 - `references/frameback.md`: how review decisions reach version N+1 (accepted comment or accepted proposal → `active`
   decision with `origin` and `since`; revert → `superseded` + `supersedes`; declined → optional `rejected`)
 
